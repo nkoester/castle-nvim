@@ -57,7 +57,7 @@ set smartcase    " ?
 
 """""""""""""""""""""""""""""
 " Window width/wrapping
-"""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""
 set textwidth=79
 set formatoptions-=t
 set wrap
@@ -101,12 +101,6 @@ nnoremap <F2> :w<CR>
 " source the config file
 inoremap <F5> <Esc>:source $MYVIMRC<CR>:echo "sourced $MYVIMRC"<CR>a
 nnoremap <F5> :source $MYVIMRC<CR>:echo "sourced $MYVIMRC"<CR>
-
-" Because 'Shift+;' for a ':' sucks
-"nnoremap ; :
-"nnoremap : ;
-"vnoremap ; :
-"vnoremap : ;
 
 " Don't use Ex mode, use Q for formatting
 nnoremap Q gq
@@ -254,21 +248,30 @@ if has("spell")
     highlight SpellLocal cterm=bold ctermbg=166
 endif
 
+" remap stupid movement bindings
+noremap ; l
+noremap l k
+noremap k j
+noremap j h
+
 " split movement
 nmap <c-Left> <c-w>h
 nmap <c-Down> <c-w>j
 nmap <c-Right> <c-w>l
 nmap <c-Up> <c-w>k
 
+" Use ctrl-[hjkl] to select the active split!
+" note: it is imposible to map <c-;>
+nmap <silent> <c-k> :wincmd k<CR>
+nmap <silent> <c-j> :wincmd j<CR>
+nmap <silent> <c-h> :wincmd h<CR>
+nmap <silent> <c-l> :wincmd l<CR>
+
+
 " buffer movement
 map <a-Left> :bprevious<CR>
 map <a-Right> :bnext<CR>
 
-" remap stupid movement bindings
-noremap ; l
-noremap l k
-noremap k j
-noremap j h
 
 " pathogen setup
 " execute pathogen#infect()
@@ -318,7 +321,19 @@ Plug 'https://github.com/907th/vim-auto-save', { 'for': ['tex', 'dem' ] }
 Plug 'lervag/vimtex', { 'for': ['tex', 'dem' ] }
 
 
+" JS -,-
+Plug 'https://github.com/jelera/vim-javascript-syntax', { 'for': [ 'js', 'html' ] }
+
+" grammar checking
+" TODO: make this work with tex files, usless otherwise
+"Plug 'https://github.com/rhysd/vim-grammarous'
+
 call plug#end()
+
+" latex stuff
+let g:vimtex_view_method = 'zathura'
+let g:vimtex_compiler_progname = 'nvr'
+
 
 "map <S-Enter> <Plug>(easymotion-prefix)
 
@@ -395,6 +410,8 @@ syntax enable
 " colors etc.
 """""""""""""""""
 colorscheme jellybeans
+highlight Normal ctermbg=none
+highlight NonText ctermbg=none
 
 "row
 set cursorline
