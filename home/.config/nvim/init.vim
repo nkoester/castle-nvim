@@ -254,6 +254,10 @@ noremap l k
 noremap k j
 noremap j h
 
+" wraped line movement
+noremap gl gk
+noremap gk gj
+
 " split movement
 nmap <c-Left> <c-w>h
 nmap <c-Down> <c-w>j
@@ -324,6 +328,27 @@ Plug 'lervag/vimtex', { 'for': ['tex', 'dem' ] }
 " JS -,-
 Plug 'https://github.com/jelera/vim-javascript-syntax', { 'for': [ 'js', 'html' ] }
 
+" markdown magic
+" all pretty much useless :/
+Plug 'https://github.com/vim-pandoc/vim-pandoc', { 'for': [ 'markdown', 'mrk', 'md', 'txt' ] }
+Plug 'https://github.com/vim-pandoc/vim-pandoc-syntax', { 'for': [ 'markdown', 'mrk', 'md', 'txt' ] }
+Plug 'gabrielelana/vim-markdown', { 'for': [ 'markdown', 'mrk', 'md', 'txt' ] }
+
+"undo tree
+Plug 'https://github.com/mbbill/undotree'
+
+" table format
+Plug 'godlygeek/tabular', { 'for': [ 'markdown', 'mrk', 'md', 'txt' ] }
+
+
+Plug 'Raimondi/delimitMate'
+
+" handle buffer closing in a smart-ish way
+Plug 'mhinz/vim-sayonara'
+
+" Autoformat files
+Plug 'Chiel92/vim-autoformat'
+
 " grammar checking
 " TODO: make this work with tex files, usless otherwise
 "Plug 'https://github.com/rhysd/vim-grammarous'
@@ -373,8 +398,8 @@ call camelcasemotion#CreateMotionMappings('<leader>')
 set ts=4 sw=4 et
 let g:indent_guides_start_level = 2
 let g:indent_guides_guide_size = 4
-
-map <F3> <Esc>\ig<CR>:echo "Indent Guides toggle"<CR>
+let g:indent_guides_enable_on_vim_startup = 1
+map <F3> <Esc>\ig:echo "Indent Guides toggle"<CR>
 
 " vim-better-whitespace
 " trim on save
@@ -385,6 +410,7 @@ let g:goyo_linenr=1
 let g:goyo_height= '90%'
 let g:goyo_width = 100
 
+" have multiple columns ofthe same document
 noremap <silent> <Leader>cm :exe ColumnMode()<CR>
 function! ColumnMode()
   exe "norm \<C-u>"
@@ -403,12 +429,68 @@ endfunction
 " enable if this is a file we define this for
 let g:auto_save = 1
 
+" autoformat file if possible
+noremap <C-A-f> :Autoformat<CR>
+
+
 syntax enable
 
+" markdown settings
+"autocmd BufNewFile,BufReadPost *.md set filetype=markdown
+"autocmd BufNewFile,BufReadPost *.markdown set filetype=markdown
+"autocmd BufNewFile,BufReadPost *.mrk set filetype=markdown
+"autocmd BufNewFile,BufReadPost *.txt set filetype=markdown
+
+" Auto lists: Automatically continue/end lists by adding markers if the
+" previous line is a list item, or removing them when they are empty
+function! s:auto_list()
+  let l:preceding_line = getline(line(".") - 1)
+  if l:preceding_line =~ '\v^\d+\.\s.'
+    " The previous line matches any number of digits followed by a full-stop
+    " followed by one character of whitespace followed by one more character
+    " i.e. it is an ordered list item
+
+    " Continue the list
+    let l:list_index = matchstr(l:preceding_line, '\v^\d*')
+    call setline(".", l:list_index + 1. ". ")
+  elseif l:preceding_line =~ '\v^\d+\.\s$'
+    " The previous line matches any number of digits followed by a full-stop
+    " followed by one character of whitespace followed by nothing
+    " i.e. it is an empty ordered list item
+
+    " End the list and clear the empty item
+    call setline(line(".") - 1, "")
+  elseif l:preceding_line[0] == "-" && l:preceding_line[1] == " "
+    " The previous line is an unordered list item
+    if strlen(l:preceding_line) == 2
+      " ...which is empty: end the list and clear the empty item
+      call setline(line(".") - 1, "")
+    else
+      " ...which is not empty: continue the list
+      call setline(".", "- ")
+    endif
+  endif
+endfunction
+
+
+" N.B. Currently only enabled for return key in insert mode, not for normal
+" mode 'o' or 'O'
+if exists(':MarkdownEditBlock')
+    inoremap <buffer> <CR> <CR><Esc>:call <SID>auto_list()<CR>A
+endif
+
+" undotree bindings
+nnoremap <F6> :UndotreeToggle<cr>:UndotreeFocus<cr>
+
+" softwrap lines
+set breakindent
+let &showbreak = '↳ '
+"showbreak="↳·"
 
 """""""""""""""""
 " colors etc.
 """""""""""""""""
+set background=dark
 colorscheme jellybeans
 highlight Normal ctermbg=none
 highlight NonText ctermbg=none
@@ -442,6 +524,13 @@ au BufNewFile,BufRead,BufReadPost *.project set filetype=json
 au BufNewFile,BufRead,BufReadPost *.distribution set filetype=json
 let g:vim_json_syntax_conceal = 0
 
+" special hidden chars
+set listchars=tab:▸\ ,eol:¬
+set list
+
+" indent colors
+hi IndentGuidesOdd  ctermbg=235
+hi IndentGuidesEven ctermbg=238
 
 """"
 "" NEOVIM stuff
