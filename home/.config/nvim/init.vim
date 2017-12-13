@@ -258,6 +258,23 @@ noremap j h
 noremap gl gk
 noremap gk gj
 
+" move blocks of lines with alt+jkl;
+nnoremap <A-k> :m .+1<CR>==
+nnoremap <A-l> :m .-2<CR>==
+nnoremap <A-S-k> :m .+5<CR>==
+nnoremap <A-S-l> :m .-7<CR>==
+
+inoremap <A-k> <Esc>:m .+1<CR>==gi
+inoremap <A-l> <Esc>:m .-2<CR>==gi
+inoremap <A-S-k> <Esc>:m .+5<CR>==gi
+inoremap <A-S-l> <Esc>:m .-7<CR>==gi
+
+vnoremap <A-k> :m '>+1<CR>gv=gv
+vnoremap <A-l> :m '<-2<CR>gv=gv
+vnoremap <A-S-k> :m '>+5<CR>gv=gv
+vnoremap <A-S-l> :m '<-7<CR>gv=gv
+
+
 " split movement
 nmap <c-Left> <c-w>h
 nmap <c-Down> <c-w>j
@@ -281,7 +298,7 @@ map <a-Right> :bnext<CR>
 " execute pathogen#infect()
 call plug#begin('~/.local/share/nvim/plugged')
 
-Plug 'https://github.com/elzr/vim-json.git', { 'for': ['json', 'distribution', 'project'] }
+Plug 'https://github.com/elzr/vim-json.git', { 'for': ['json', 'distribution', 'project', 'template'] }
 
 "Plug 'https://github.com/altercation/vim-colors-solarized.git'
 Plug 'https://github.com/flazz/vim-colorschemes.git'
@@ -309,6 +326,10 @@ Plug 'tomtom/tcomment_vim'
 Plug 'https://github.com/vim-scripts/zoomwintab.vim'
 
 "Plug 'valloric/youcompleteme'
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+Plug 'sirver/UltiSnips'
+Plug 'honza/vim-snippets'
+
 Plug 'davidhalter/jedi-vim'
 
 Plug 'bling/vim-airline'
@@ -321,8 +342,8 @@ Plug 'junegunn/goyo.vim'
 Plug 'embear/vim-foldsearch'
 
 " latex stuff
-Plug 'https://github.com/907th/vim-auto-save', { 'for': ['tex', 'dem' ] }
-Plug 'lervag/vimtex', { 'for': ['tex', 'dem' ] }
+Plug 'https://github.com/907th/vim-auto-save', { 'for': [ 'tex', 'dem', 'md', 'txt' ] }
+Plug 'lervag/vimtex'
 
 
 " JS -,-
@@ -349,6 +370,13 @@ Plug 'mhinz/vim-sayonara'
 " Autoformat files
 Plug 'Chiel92/vim-autoformat'
 
+" fuzzy file search
+Plug 'cloudhead/neovim-fuzzy'
+
+" treeee
+Plug 'scrooloose/nerdtree'
+
+
 " grammar checking
 " TODO: make this work with tex files, usless otherwise
 "Plug 'https://github.com/rhysd/vim-grammarous'
@@ -358,7 +386,7 @@ call plug#end()
 " latex stuff
 let g:vimtex_view_method = 'zathura'
 let g:vimtex_compiler_progname = 'nvr'
-
+let g:vimtex_view_use_temp_files = 1
 
 "map <S-Enter> <Plug>(easymotion-prefix)
 
@@ -432,6 +460,7 @@ let g:auto_save = 1
 " autoformat file if possible
 noremap <C-A-f> :Autoformat<CR>
 
+nnoremap <C-p> :FuzzyOpen<CR>
 
 syntax enable
 
@@ -484,8 +513,29 @@ nnoremap <F6> :UndotreeToggle<cr>:UndotreeFocus<cr>
 
 " softwrap lines
 set breakindent
-let &showbreak = '↳ '
+let &showbreak = ' ↳ '
 "showbreak="↳·"
+
+"nerdtree calling
+nnoremap <F7> :NERDTreeToggle<cr>
+
+" Use deoplete.
+let g:deoplete#enable_at_startup = 1
+
+" deoplete completion for LaTeX
+if !exists('g:deoplete#omni#input_patterns')
+    let g:deoplete#omni#input_patterns = {}
+endif
+let g:deoplete#omni#input_patterns.tex = g:vimtex#re#deoplete
+
+" deoplete setting or ultisnips
+call deoplete#custom#set('ultisnips', 'matchers', ['matcher_fuzzy'])
+
+
+" UltiSnips settings
+let g:UltiSnipsEditSplit = "context"
+let g:UltiSnipsSnippetsDir = "~/.config/nvim/UltiSnips"
+let g:UltiSnipsListSnippets = "<A-tab>"
 
 """""""""""""""""
 " colors etc.
@@ -500,6 +550,8 @@ set cursorline
 highlight CursorLine term=NONE cterm=NONE ctermbg=237
 " makes it a bit faster to scroll ...
 set lazyredraw
+" VS actually redraws when required (e.g. fullscreen)
+"set nolazyredraw
 
 "margin
 set colorcolumn=80
@@ -527,6 +579,8 @@ let g:vim_json_syntax_conceal = 0
 " special hidden chars
 set listchars=tab:▸\ ,eol:¬
 set list
+" eol colour (232-255)
+hi NonText ctermfg=65
 
 " indent colors
 hi IndentGuidesOdd  ctermbg=235
@@ -540,6 +594,12 @@ hi IndentGuidesEven ctermbg=238
 set mouse=c
 
 set clipboard+=unnamedplus
+
+" resize splits with + and -
+if bufwinnr(1)
+  map + <C-W>+
+  map - <C-W>-
+endif
 
 "" Copy to clipboard
 "vnoremap  <leader>y  "+y
