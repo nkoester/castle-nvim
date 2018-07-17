@@ -120,6 +120,9 @@ nnoremap <C-J> A<CR><Esc>
 " Map Ctrl-Space to insert a single space :)
 nnoremap <NUL> i<Space><Esc>
 
+" replace a word with currently yanked text
+nnoremap S "_diwP
+
 """"""""""""""""
 " Auto completion
 """"""""""""""""
@@ -300,6 +303,8 @@ call plug#begin('~/.local/share/nvim/plugged')
 
 Plug 'https://github.com/elzr/vim-json.git', { 'for': ['json', 'distribution', 'project', 'template'] }
 
+Plug 'https://github.com/dylon/vim-antlr.git', { 'for': ['g4'] }
+
 "Plug 'https://github.com/altercation/vim-colors-solarized.git'
 Plug 'https://github.com/flazz/vim-colorschemes.git'
 Plug 'https://github.com/ervandew/supertab.git'
@@ -312,7 +317,9 @@ Plug 'tpope/vim-fugitive'
 
 Plug 'https://github.com/tpope/vim-unimpaired.git'
 
-Plug 'https://github.com/vim-syntastic/syntastic'
+"Plug 'https://github.com/vim-syntastic/syntastic'
+Plug 'https://github.com/w0rp/ale'
+Plug 'https://github.com/rhysd/vim-grammarous'
 
 Plug 'bkad/CamelCaseMotion'
 
@@ -345,7 +352,6 @@ Plug 'embear/vim-foldsearch'
 Plug 'https://github.com/907th/vim-auto-save', { 'for': [ 'tex', 'dem', 'md', 'txt' ] }
 Plug 'lervag/vimtex'
 
-
 " JS -,-
 Plug 'https://github.com/jelera/vim-javascript-syntax', { 'for': [ 'js', 'html' ] }
 
@@ -376,12 +382,32 @@ Plug 'cloudhead/neovim-fuzzy'
 " treeee
 Plug 'scrooloose/nerdtree'
 
+" language server clien StringIOt
+Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
 
 " grammar checking
 " TODO: make this work with tex files, usless otherwise
 "Plug 'https://github.com/rhysd/vim-grammarous'
 
+" highlight current word in text
+Plug 'dominikduda/vim_current_word'
+
+" cypher syntax highlight
+Plug 'neo4j-contrib/cypher-vim-syntax'
+
+" make figlets :)
+Plug 'fadein/vim-FIGlet'
+
 call plug#end()
+
+
+" langauge server stuff
+" todo: diabled due to first entry fill bug?
+let g:LanguageClient_autoStart = 1
+
+" let g:LanguageClient_serverCommands = {
+"     \'python' : ['/home/nkoester/.local/bin/pyls',]
+"     \ }
 
 " latex stuff
 let g:vimtex_view_method = 'zathura'
@@ -396,6 +422,10 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#syntastic#enabled = 1
 let g:airline#extensions#branch#enabled=1
 let g:airline#extensions#whitespace#checks=['indent', 'mixed-indent-file']
+
+" ale settings
+let g:ale_echo_msg_format = '[%linter%] %s% (code)% [%severity%]'
+let g:ale_lint_on_text_changed = 'never'
 
 
 "if !exists('g:airline_symbols')
@@ -464,6 +494,8 @@ nnoremap <C-p> :FuzzyOpen<CR>
 
 syntax enable
 
+autocmd BufNewFile,BufReadPost *.scxml set syntax=xml
+" autocmd BufNewFile,BufReadPost *.scxml set filetype=xml
 " markdown settings
 "autocmd BufNewFile,BufReadPost *.md set filetype=markdown
 "autocmd BufNewFile,BufReadPost *.markdown set filetype=markdown
@@ -510,8 +542,12 @@ endif
 
 " undotree bindings
 nnoremap <F6> :UndotreeToggle<cr>:UndotreeFocus<cr>
+if has("persistent_undo")
+    set undodir=~/.cache/nvim/undo/
+    set undofile
+endif
 
-" softwrap lines
+ " softwrap lines
 set breakindent
 let &showbreak = ' ↳ '
 "showbreak="↳·"
@@ -529,13 +565,19 @@ endif
 let g:deoplete#omni#input_patterns.tex = g:vimtex#re#deoplete
 
 " deoplete setting or ultisnips
-call deoplete#custom#set('ultisnips', 'matchers', ['matcher_fuzzy'])
-
+call deoplete#custom#source('ultisnips', 'matchers', ['matcher_fuzzy'])
 
 " UltiSnips settings
 let g:UltiSnipsEditSplit = "context"
 let g:UltiSnipsSnippetsDir = "~/.config/nvim/UltiSnips"
+"let g:UltiSnipsExpandTrigger="<tab>"
+" termite already used default c-tab
 let g:UltiSnipsListSnippets = "<A-tab>"
+" use jkl; down/up motion
+let g:UltiSnipsJumpForwardTrigger="<c-k>"
+let g:UltiSnipsJumpBackwardTrigger="<c-l>"
+
+
 
 """""""""""""""""
 " colors etc.
@@ -575,6 +617,10 @@ au BufRead,BufNewFile,BufReadPost *.json set syntax=json
 au BufNewFile,BufRead,BufReadPost *.project set filetype=json
 au BufNewFile,BufRead,BufReadPost *.distribution set filetype=json
 let g:vim_json_syntax_conceal = 0
+au BufRead,BufNewFile,BufReadPost *.g4 set syntax=antlr
+au BufRead,BufNewFile,BufReadPost *.md set syntax=markdown
+au BufRead,BufNewFile,BufReadPost *.cypher set syntax=cypher
+au BufRead,BufNewFile,BufReadPost *.cql set syntax=cypher
 
 " special hidden chars
 set listchars=tab:▸\ ,eol:¬
@@ -584,7 +630,17 @@ hi NonText ctermfg=65
 
 " indent colors
 hi IndentGuidesOdd  ctermbg=235
-hi IndentGuidesEven ctermbg=238
+hi IndentGuidesEven ctermbg=234
+
+let g:vim_current_word#enabled = 1
+" word highlight
+" Twins of word under cursor:
+let g:vim_current_word#highlight_twins = 1
+" The word under cursor:
+let g:vim_current_word#highlight_current_word = 1
+highlight CurrentWord ctermbg=90
+highlight CurrentWordTwins ctermbg=54
+
 
 """"
 "" NEOVIM stuff
