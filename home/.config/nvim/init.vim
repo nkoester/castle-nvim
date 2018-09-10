@@ -97,6 +97,8 @@ inoremap jj <Esc>l
 " Write file and return to what you were doing
 inoremap <F2> <Esc>:w<CR>a
 nnoremap <F2> :w<CR>
+noremap W :update<CR>
+
 
 " source the config file
 inoremap <F5> <Esc>:source $MYVIMRC<CR>:echo "sourced $MYVIMRC"<CR>a
@@ -349,7 +351,7 @@ Plug 'junegunn/goyo.vim'
 Plug 'embear/vim-foldsearch'
 
 " latex stuff
-Plug 'https://github.com/907th/vim-auto-save', { 'for': [ 'tex', 'dem', 'md', 'txt' ] }
+Plug 'https://github.com/907th/vim-auto-save', { 'for': [ 'dem', 'md', 'txt' ] }
 Plug 'lervag/vimtex'
 
 " JS -,-
@@ -451,6 +453,10 @@ set updatetime=250
 
 "CamelCaseMotion
 call camelcasemotion#CreateMotionMappings('<leader>')
+
+" allow project-specific settings
+set exrc
+set secure
 
 " indent-guides
 set ts=4 sw=4 et
@@ -582,6 +588,7 @@ let g:UltiSnipsJumpBackwardTrigger="<c-l>"
 """""""""""""""""
 " colors etc.
 """""""""""""""""
+set termguicolors
 set background=dark
 colorscheme jellybeans
 highlight Normal ctermbg=none
@@ -614,8 +621,10 @@ autocmd VimLeave * let &t_me="\<Esc>[6 q"
 
 " better json
 au BufRead,BufNewFile,BufReadPost *.json set syntax=json
-au BufNewFile,BufRead,BufReadPost *.project set filetype=json
-au BufNewFile,BufRead,BufReadPost *.distribution set filetype=json
+"au BufNewFile,BufRead,BufReadPost *.project set filetype=json
+"au BufNewFile,BufRead,BufReadPost *.distribution set filetype=json
+au BufNewFile,BufRead,BufReadPost *.project set filetype=yaml
+au BufNewFile,BufRead,BufReadPost *.distribution set filetype=yaml
 let g:vim_json_syntax_conceal = 0
 au BufRead,BufNewFile,BufReadPost *.g4 set syntax=antlr
 au BufRead,BufNewFile,BufReadPost *.md set syntax=markdown
