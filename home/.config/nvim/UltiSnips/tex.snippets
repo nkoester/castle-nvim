@@ -1,0 +1,39 @@
+snippet newglsentry
+\newglossaryentry{${1:NAME}}
+{
+    name={$1},
+    description={${2:DESCRIPTION}}
+}
+endsnippet
+
+snippet gls "Creates a Latex \gls{} command."
+\gls{${1}}
+endsnippet
+
+snippet glspl "Creates a Latex \glspl{} command."
+\glspl{${1}}
+endsnippet
+
+snippet newglsdualentry
+\newglossarydualentry{${1:ABREV}}{$1}{${2:SHORT}}{${3:LONG}}
+endsnippet
+
+snippet autocite
+~\autocite{${1:KEY}}
+endsnippet
+
+
+snippet inlineenum
+\begin{inparaenum}[${1:a)}]
+    \item ${2:item}
+    \item ${3}
+\end{inparaenum}
+endsnippet
+
+snippet quote
+\textquote{${1:TEXT}}
+endsnippet
+
+snippet ttt
+\texttt{${1:TEXT}}
+endsnippet
