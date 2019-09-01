@@ -99,6 +99,17 @@ inoremap <F2> <Esc>:w<CR>a
 nnoremap <F2> :w<CR>
 noremap W :update<CR>
 
+" let mapleader="\<SPACE>"
+map <space> <leader>
+map <space><space> <leader><leader>
+
+
+noremap <Leader>q :Sayonara<CR>
+noremap <Leader>c :cclose<CR>
+noremap <Leader>o :copen<CR>
+noremap <Leader>e :e<CR>
+
+
 
 " source the config file
 inoremap <F5> <Esc>:source $MYVIMRC<CR>:echo "sourced $MYVIMRC"<CR>a
@@ -235,7 +246,8 @@ if has("spell")
     nnoremap [s [sz=
     nnoremap ]s ]sz=
 
-    "set spell spelllang=en,de                          " spell checking
+    set spell spelllang=en,de                          " spell checking
+    "set spellfile=~/.vim/spell/techspeak.utf-8.add
     "highlight PmenuSel ctermfg=black ctermbg=lightgray " they were using white on white
 
     set sps=best,10       " limit it to just the top 10 items
@@ -303,7 +315,8 @@ map <a-Right> :bnext<CR>
 " execute pathogen#infect()
 call plug#begin('~/.local/share/nvim/plugged')
 
-Plug 'https://github.com/elzr/vim-json.git', { 'for': ['json', 'distribution', 'project', 'template'] }
+" Plug 'https://github.com/elzr/vim-json.git', { 'for': ['json', 'distribution', 'project', 'template'] }
+Plug 'https://github.com/elzr/vim-json.git' ", { 'for': ['json', 'distribution', 'project', 'template'] }
 
 Plug 'https://github.com/dylon/vim-antlr.git', { 'for': ['g4'] }
 
@@ -312,9 +325,9 @@ Plug 'https://github.com/flazz/vim-colorschemes.git'
 Plug 'https://github.com/ervandew/supertab.git'
 Plug 'https://github.com/vim-scripts/SearchComplete.git'
 Plug 'https://github.com/easymotion/vim-easymotion.git'
-Plug 'https://github.com/tpope/vim-surround'
+Plug 'https://github.com/machakann/vim-sandwich'
 
-Plug 'airblade/vim-gitgutter'
+" Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-fugitive'
 
 Plug 'https://github.com/tpope/vim-unimpaired.git'
@@ -359,15 +372,19 @@ Plug 'https://github.com/jelera/vim-javascript-syntax', { 'for': [ 'js', 'html' 
 
 " markdown magic
 " all pretty much useless :/
-Plug 'https://github.com/vim-pandoc/vim-pandoc', { 'for': [ 'markdown', 'mrk', 'md', 'txt' ] }
-Plug 'https://github.com/vim-pandoc/vim-pandoc-syntax', { 'for': [ 'markdown', 'mrk', 'md', 'txt' ] }
-Plug 'gabrielelana/vim-markdown', { 'for': [ 'markdown', 'mrk', 'md', 'txt' ] }
+" Plug 'https://github.com/vim-pandoc/vim-pandoc', { 'for': [ 'markdown', 'mrk', 'md', 'txt' ] }
+" Plug 'https://github.com/vim-pandoc/vim-pandoc-syntax', { 'for': [ 'markdown', 'mrk', 'md', 'txt' ] }
+" Plug 'gabrielelana/vim-markdown', { 'for': [ 'markdown', 'mrk', 'md', 'txt' ] }
+" language collection
+Plug 'sheerun/vim-polyglot'
+
 
 "undo tree
 Plug 'https://github.com/mbbill/undotree'
 
 " table format
-Plug 'godlygeek/tabular', { 'for': [ 'markdown', 'mrk', 'md', 'txt' ] }
+" Plug 'godlygeek/tabular', { 'for': [ 'markdown', 'mrk', 'md', 'txt' ] }
+Plug 'https://github.com/dhruvasagar/vim-table-mode', { 'for': [ 'markdown', 'mrk', 'md', 'txt' ] }
 
 
 Plug 'Raimondi/delimitMate'
@@ -385,7 +402,12 @@ Plug 'cloudhead/neovim-fuzzy'
 Plug 'scrooloose/nerdtree'
 
 " language server clien StringIOt
-Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
+Plug 'autozimu/LanguageClient-neovim', {
+    \ 'branch': 'next',
+    \ 'do': 'bash install.sh',
+    \ }
+
+Plug 'fatih/vim-go'
 
 " grammar checking
 " TODO: make this work with tex files, usless otherwise
@@ -400,6 +422,12 @@ Plug 'neo4j-contrib/cypher-vim-syntax'
 " make figlets :)
 Plug 'fadein/vim-FIGlet'
 
+" graphviz/dot
+Plug 'https://github.com/wannesm/wmgraphviz.vim'
+
+" highlights overused words // ToggleDitto
+Plug 'https://github.com/dbmrq/vim-ditto'
+
 call plug#end()
 
 
@@ -407,16 +435,31 @@ call plug#end()
 " todo: diabled due to first entry fill bug?
 let g:LanguageClient_autoStart = 1
 
-" let g:LanguageClient_serverCommands = {
-"     \'python' : ['/home/nkoester/.local/bin/pyls',]
-"     \ }
+let g:LanguageClient_serverCommands = {
+    \'python' : ['/usr/bin/pyls',],
+    \'go' : ['/usr/bin/gopls',]
+    \ }
+
+nnoremap <C-l> :call LanguageClient_contextMenu()<CR>
+let g:LanguageClient_useVirtualText = 1
 
 " latex stuff
-let g:vimtex_view_method = 'zathura'
-let g:vimtex_compiler_progname = 'nvr'
 let g:vimtex_view_use_temp_files = 1
+let g:vimtex_compiler_progname = 'nvr'
+let g:vimtex_view_method = 'zathura'
+let g:tex_flavor = 'latex'
+let g:polyglot_disabled = ['latex']
+" does not work?
+" let g:vimtex_index_split_width = 50
 
+" Easy motion config
 "map <S-Enter> <Plug>(easymotion-prefix)
+" Move to word
+map  <Leader><Leader>w <Plug>(easymotion-bd-w)
+nmap <Leader><Leader>w <Plug>(easymotion-overwin-w)
+"" Move to line
+map <Leader><Leader>l <Plug>(easymotion-bd-jk)
+nmap <Leader><Leader>l <Plug>(easymotion-overwin-line)
 
 " airline settings
 let g:airline_powerline_fonts = 1
@@ -427,8 +470,20 @@ let g:airline#extensions#whitespace#checks=['indent', 'mixed-indent-file']
 
 " ale settings
 let g:ale_echo_msg_format = '[%linter%] %s% (code)% [%severity%]'
+" always check
 let g:ale_lint_on_text_changed = 'never'
+let g:ale_sign_error = '💣'
+let g:ale_sign_warning = '🚩'
+let g:ale_enabled = 0
 
+" surround sandwich
+let g:sandwich#recipes = deepcopy(g:sandwich#default_recipes)
+nmap s <Nop>
+xmap s <Nop>
+nmap <Leader>gl <Plug>(operator-sandwich-add)iwcgls<CR>
+nmap <Leader>gp <Plug>(operator-sandwich-add)iwcglspl<CR>
+nmap <Leader>tq <Plug>(operator-sandwich-add)iwctextquote<CR>
+vmap <Leader>tq <Plug>(operator-sandwich-add)ctextquote<CR>
 
 "if !exists('g:airline_symbols')
 "  let g:airline_symbols = {}
@@ -444,6 +499,7 @@ let g:airline_right_sep='▟'
 "let g:airline#extensions#tabline#buffer_nr_format = '%s: '
 
 let g:airline_theme="badwolf"
+
 " avoid insert mode leave lag
 set ttimeoutlen=10
 " always show
@@ -469,13 +525,17 @@ map <F3> <Esc>\ig:echo "Indent Guides toggle"<CR>
 " trim on save
 autocmd BufWritePre * StripWhitespace
 
+" vim table mode
+let g:table_mode_corner='|'
+" autocmd BufNewFile,BufRead *.md execute !TableModeToggle
+
 " Goyo config
 let g:goyo_linenr=1
 let g:goyo_height= '90%'
 let g:goyo_width = 100
 
 " have multiple columns ofthe same document
-noremap <silent> <Leader>cm :exe ColumnMode()<CR>
+noremap <silent> <Leader>mm :exe ColumnMode()<CR>
 function! ColumnMode()
   exe "norm \<C-u>"
   let @z=&so
@@ -559,7 +619,20 @@ let &showbreak = ' ↳ '
 "showbreak="↳·"
 
 "nerdtree calling
-nnoremap <F7> :NERDTreeToggle<cr>
+nnoremap <F8> :NERDTreeToggle<cr>
+
+"graphviz plugin settings
+let g:WMGraphviz_viewer = "zathura"
+
+" override the interactive mode to use xdot
+fu! GraphvizInteractive()
+	if !executable(g:WMGraphviz_dot)
+		echoerr 'The "'.g:WMGraphviz_dot.'" executable was not found.'
+		return
+	endif
+
+	silent exec '!xdot '.shellescape(expand('%:p')).' &'
+endfu
 
 " Use deoplete.
 let g:deoplete#enable_at_startup = 1
@@ -574,14 +647,23 @@ let g:deoplete#omni#input_patterns.tex = g:vimtex#re#deoplete
 call deoplete#custom#source('ultisnips', 'matchers', ['matcher_fuzzy'])
 
 " UltiSnips settings
-let g:UltiSnipsEditSplit = "context"
+" let g:UltiSnipsEditSplit = "context"
 let g:UltiSnipsSnippetsDir = "~/.config/nvim/UltiSnips"
+" let g:UltiSnipsSnippetDirectories = ["/home/nkoester/.local/share/nvim/plugged/vim-snippets/snippets/"]
+
 "let g:UltiSnipsExpandTrigger="<tab>"
 " termite already used default c-tab
 let g:UltiSnipsListSnippets = "<A-tab>"
 " use jkl; down/up motion
 let g:UltiSnipsJumpForwardTrigger="<c-k>"
 let g:UltiSnipsJumpBackwardTrigger="<c-l>"
+
+
+" supertab
+" tab = go list down
+"let g:SuperTabDefaultCompletionType = "<c-n>"
+"or if your default completion type is currently context then you can use this instead:
+" let g:SuperTabContextDefaultCompletionType = "<c-n>"
 
 
 
@@ -598,7 +680,7 @@ highlight NonText ctermbg=none
 set cursorline
 highlight CursorLine term=NONE cterm=NONE ctermbg=237
 " makes it a bit faster to scroll ...
-set lazyredraw
+" set lazyredraw
 " VS actually redraws when required (e.g. fullscreen)
 "set nolazyredraw
 
@@ -621,8 +703,9 @@ autocmd VimLeave * let &t_me="\<Esc>[6 q"
 
 " better json
 au BufRead,BufNewFile,BufReadPost *.json set syntax=json
-"au BufNewFile,BufRead,BufReadPost *.project set filetype=json
-"au BufNewFile,BufRead,BufReadPost *.distribution set filetype=json
+au BufNewFile,BufRead,BufReadPost *.project set filetype=yaml
+au BufNewFile,BufRead,BufReadPost *.distribution set filetype=yaml
+au BufNewFile,BufRead,BufReadPost *.template set filetype=yaml
 au BufNewFile,BufRead,BufReadPost *.project set filetype=yaml
 au BufNewFile,BufRead,BufReadPost *.distribution set filetype=yaml
 let g:vim_json_syntax_conceal = 0
@@ -641,14 +724,22 @@ hi NonText ctermfg=65
 hi IndentGuidesOdd  ctermbg=235
 hi IndentGuidesEven ctermbg=234
 
+" current word highlight
 let g:vim_current_word#enabled = 1
-" word highlight
 " Twins of word under cursor:
 let g:vim_current_word#highlight_twins = 1
 " The word under cursor:
 let g:vim_current_word#highlight_current_word = 1
-highlight CurrentWord ctermbg=90
-highlight CurrentWordTwins ctermbg=54
+
+" highlight CurrentWord ctermbg=90
+" highlight CurrentWordTwins ctermbg=54
+
+let g:vim_current_word#twins_match_id = 502999
+let g:vim_current_word#current_word_match_id = 502998
+
+highlight CurrentWord ctermfg=15 ctermbg=15 cterm=bold
+highlight CurrentWordTwins ctermfg=15 ctermbg=55 cterm=bold
+
 
 
 """"
@@ -677,3 +768,25 @@ endif
 "nnoremap <leader>P "+P
 "vnoremap <leader>p "+p
 "vnoremap <leader>P "+P
+
+
+
+" switch / move letters and words
+nnoremap <silent> <A-C-j> Xph
+nnoremap <silent> <A-C-;> xp
+
+nnoremap <silent> scl Xph
+nnoremap <silent> scr xp
+
+nnoremap <silent> <A-j> "_yiw?\w\+\_W\+\%#<CR>:s/\(\%#\w\+\)\(\_W\+\)\(\w\+\)/\3\2\1/<CR><c-o><c-l>:nohlsearch<CR>
+nnoremap <silent> <A-;> "_yiw:s/\(\%#\w\+\)\(\_W\+\)\(\w\+\)/\3\2\1/<CR><c-o>/\w\+\_W\+<CR><c-l>:nohlsearch<CR>
+
+nnoremap <silent> swl "_yiw?\w\+\_W\+\%#<CR>:s/\(\%#\w\+\)\(\_W\+\)\(\w\+\)/\3\2\1/<CR><c-o><c-l>:nohlsearch<CR>
+nnoremap <silent> swr "_yiw:s/\(\%#\w\+\)\(\_W\+\)\(\w\+\)/\3\2\1/<CR><c-o>/\w\+\_W\+<CR><c-l>:nohlsearch<CR>
+
+
+set diffopt=internal,filler,iwhite
+
+" use shift+0 to paste zero register (yank register)
+nnoremap ) "0P
+
