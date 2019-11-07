@@ -16,6 +16,7 @@ set nocompatible
 " Miscellaneous settings ...
 """""""""""""""""""""""""""""
 set number                     " Show line numbers <3
+set number relativenumber      " relative and absolute line number mix
 set hidden                     " Allow hidden buffers, don't limit to 1 file per window/split
 
 set backspace=indent,eol,start " allow backspacing over everything in insert mode
@@ -408,6 +409,8 @@ Plug 'autozimu/LanguageClient-neovim', {
     \ }
 
 Plug 'fatih/vim-go'
+Plug 'OmniSharp/omnisharp-vim'
+
 
 " grammar checking
 " TODO: make this work with tex files, usless otherwise
@@ -428,21 +431,34 @@ Plug 'https://github.com/wannesm/wmgraphviz.vim'
 " highlights overused words // ToggleDitto
 Plug 'https://github.com/dbmrq/vim-ditto'
 
+" Thesaurus call
+Plug 'ron89/thesaurus_query.vim'
 call plug#end()
 
+" ---------------------------
+" Plugin Configurations
+" ---------------------------
 
+
+" ---------------------------
 " langauge server stuff
 " todo: diabled due to first entry fill bug?
 let g:LanguageClient_autoStart = 1
 
 let g:LanguageClient_serverCommands = {
     \'python' : ['/usr/bin/pyls',],
-    \'go' : ['/usr/bin/gopls',]
+    \'go' : ['/usr/bin/gopls',],
+    \'cs': ['/opt/omnisharp-roslyn/OmniSharp.exe',]
     \ }
+" \'cs': ['omnisharp'],
+" \ 'cs': ['mono', '/opt/omnisharp-roslyn/OmniSharp.exe', '--languageserver', '--verbose'],
 
 nnoremap <C-l> :call LanguageClient_contextMenu()<CR>
 let g:LanguageClient_useVirtualText = 1
+" ---------------------------
 
+
+" ---------------------------
 " latex stuff
 let g:vimtex_view_use_temp_files = 1
 let g:vimtex_compiler_progname = 'nvr'
@@ -451,7 +467,10 @@ let g:tex_flavor = 'latex'
 let g:polyglot_disabled = ['latex']
 " does not work?
 " let g:vimtex_index_split_width = 50
+" ---------------------------
 
+
+" ---------------------------
 " Easy motion config
 "map <S-Enter> <Plug>(easymotion-prefix)
 " Move to word
@@ -460,30 +479,16 @@ nmap <Leader><Leader>w <Plug>(easymotion-overwin-w)
 "" Move to line
 map <Leader><Leader>l <Plug>(easymotion-bd-jk)
 nmap <Leader><Leader>l <Plug>(easymotion-overwin-line)
+" ---------------------------
 
+
+" ---------------------------
 " airline settings
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#syntastic#enabled = 1
 let g:airline#extensions#branch#enabled=1
 let g:airline#extensions#whitespace#checks=['indent', 'mixed-indent-file']
-
-" ale settings
-let g:ale_echo_msg_format = '[%linter%] %s% (code)% [%severity%]'
-" always check
-let g:ale_lint_on_text_changed = 'never'
-let g:ale_sign_error = '💣'
-let g:ale_sign_warning = '🚩'
-let g:ale_enabled = 0
-
-" surround sandwich
-let g:sandwich#recipes = deepcopy(g:sandwich#default_recipes)
-nmap s <Nop>
-xmap s <Nop>
-nmap <Leader>gl <Plug>(operator-sandwich-add)iwcgls<CR>
-nmap <Leader>gp <Plug>(operator-sandwich-add)iwcglspl<CR>
-nmap <Leader>tq <Plug>(operator-sandwich-add)iwctextquote<CR>
-vmap <Leader>tq <Plug>(operator-sandwich-add)ctextquote<CR>
 
 "if !exists('g:airline_symbols')
 "  let g:airline_symbols = {}
@@ -499,40 +504,197 @@ let g:airline_right_sep='▟'
 "let g:airline#extensions#tabline#buffer_nr_format = '%s: '
 
 let g:airline_theme="badwolf"
+" ---------------------------
 
-" avoid insert mode leave lag
-set ttimeoutlen=10
-" always show
-set laststatus=2
-" reduced from 4000
-set updatetime=250
 
+" ---------------------------
+" ale settings
+let g:ale_echo_msg_format = '[%linter%] %s% (code)% [%severity%]'
+" always check
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_sign_error = '💣'
+let g:ale_sign_warning = '🚩'
+let g:ale_enabled = 0
+" ---------------------------
+
+
+" ---------------------------
+" surround sandwich
+let g:sandwich#recipes = deepcopy(g:sandwich#default_recipes)
+nmap s <Nop>
+xmap s <Nop>
+nmap <Leader>gl <Plug>(operator-sandwich-add)iwcgls<CR>
+nmap <Leader>gp <Plug>(operator-sandwich-add)iwcglspl<CR>ex
+nmap <Leader>tq <Plug>(operator-sandwich-add)iwctextquote<CR>
+vmap <Leader>tq <Plug>(operator-sandwich-add)ctextquote<CR>
+" ---------------------------
+
+
+" ---------------------------
 "CamelCaseMotion
 call camelcasemotion#CreateMotionMappings('<leader>')
+" ---------------------------
 
-" allow project-specific settings
-set exrc
-set secure
 
+" ---------------------------
+" current word highlight
+let g:vim_current_word#enabled = 1
+" Twins of word under cursor:
+let g:vim_current_word#highlight_twins = 1
+" The word under cursor:
+let g:vim_current_word#highlight_current_word = 1
+
+" highlight CurrentWord ctermbg=90
+" highlight CurrentWordTwins ctermbg=54
+
+let g:vim_current_word#twins_match_id = 502999
+let g:vim_current_word#current_word_match_id = 502998
+
+highlight CurrentWord ctermfg=15 ctermbg=15 cterm=bold
+highlight CurrentWordTwins ctermfg=15 ctermbg=55 cterm=bold
+" ---------------------------
+
+
+" ---------------------------
+" vim-better-whitespace
+" trim on save
+autocmd BufWritePre * StripWhitespace
+" ---------------------------
+
+
+" ---------------------------
+" vim table mode
+let g:table_mode_corner='|'
+" autocmd BufNewFile,BufRead *.md execute !TableModeToggle
+" ---------------------------
+
+
+" ---------------------------
+" Goyo config
+let g:goyo_linenr=1
+let g:goyo_height= '90%'
+let g:goyo_width = 100
+" ---------------------------
+
+
+" ---------------------------
+" vim-autosave
+" enable if this is a file we define this for
+let g:auto_save = 1
+" ---------------------------
+
+
+" ---------------------------
+" autoformat file if possible
+noremap <C-A-f> :Autoformat<CR>
+" ---------------------------
+
+
+" ---------------------------
+"  fuzzy open
+nnoremap <C-p> :FuzzyOpen<CR>
+" ---------------------------
+
+
+" ---------------------------
+" undotree bindings
+nnoremap <F6> :UndotreeToggle<cr>:UndotreeFocus<cr>
+if has("persistent_undo")
+    set undodir=~/.cache/nvim/undo/
+    set undofile
+endif
+" ---------------------------
+
+
+" ---------------------------
+" nerdtree calling
+nnoremap <F8> :NERDTreeToggle<cr>
+" ---------------------------
+
+
+" ---------------------------
+" graphviz plugin settings
+let g:WMGraphviz_viewer = "zathura"
+
+" override the interactive mode to use xdot
+fu! GraphvizInteractive()
+    if !executable(g:WMGraphviz_dot)
+        echoerr 'The "'.g:WMGraphviz_dot.'" executable was not found.'
+    return
+    endif
+
+    silent exec '!xdot '.shellescape(expand('%:p')).' &'
+endfu
+" ---------------------------
+
+
+" ---------------------------
+" Use deoplete
+let g:deoplete#enable_at_startup = 1
+
+" deoplete completion for LaTeX
+if !exists('g:deoplete#omni#input_patterns')
+    let g:deoplete#omni#input_patterns = {}
+endif
+let g:deoplete#omni#input_patterns.tex = g:vimtex#re#deoplete
+
+" deoplete setting or ultisnips
+call deoplete#custom#source('ultisnips', 'matchers', ['matcher_fuzzy'])
+" ---------------------------
+
+
+" ---------------------------
+" UltiSnips settings
+" let g:UltiSnipsEditSplit = "context"
+let g:UltiSnipsSnippetsDir = "~/.config/nvim/UltiSnips"
+" let g:UltiSnipsSnippetDirectories = ["/home/nkoester/.local/share/nvim/plugged/vim-snippets/snippets/"]
+
+"let g:UltiSnipsExpandTrigger="<tab>"
+" termite already used default c-tab
+let g:UltiSnipsListSnippets = "<A-tab>"
+" use jkl; down/up motion
+let g:UltiSnipsJumpForwardTrigger="<c-k>"
+let g:UltiSnipsJumpBackwardTrigger="<c-l>"
+" ---------------------------
+
+
+" ---------------------------
+" supertab
+" tab = go list down
+"let g:SuperTabDefaultCompletionType = "<c-n>"
+"or if your default completion type is currently context then you can use this instead:
+" let g:SuperTabContextefaultCompletionType = "<c-n>"
+" ---------------------------
+
+
+" ---------------------------
+" thesaurus config
+nnoremap <Leader><Leader>t :ThesaurusQueryReplaceCurrentWord<CR>
+let g:tq_enabled_backends=[ "openoffice_en",
+            \"datamuse_com",
+            \"openthesaurus_de",
+            \"mthesaur_txt",]
+let g:tq_language=['en', 'de']
+" ---------------------------
+
+
+" ---------------------------
 " indent-guides
 set ts=4 sw=4 et
 let g:indent_guides_start_level = 2
 let g:indent_guides_guide_size = 4
 let g:indent_guides_enable_on_vim_startup = 1
 map <F3> <Esc>\ig:echo "Indent Guides toggle"<CR>
+" ---------------------------
 
-" vim-better-whitespace
-" trim on save
-autocmd BufWritePre * StripWhitespace
 
-" vim table mode
-let g:table_mode_corner='|'
-" autocmd BufNewFile,BufRead *.md execute !TableModeToggle
 
-" Goyo config
-let g:goyo_linenr=1
-let g:goyo_height= '90%'
-let g:goyo_width = 100
+
+" ---------------------------
+" ---------------------------
+" non-plugin settings
+" ---------------------------
+" ---------------------------
 
 " have multiple columns ofthe same document
 noremap <silent> <Leader>mm :exe ColumnMode()<CR>
@@ -549,24 +711,16 @@ function! ColumnMode()
 endfunction
 
 
-" vim-autosave
-" enable if this is a file we define this for
-let g:auto_save = 1
+" avoid insert mode leave lag
+set ttimeoutlen=10
+" always show
+set laststatus=2
+" reduced from 4000
+set updatetime=250
+" allow project-specific settings
+set exrc
+set secure
 
-" autoformat file if possible
-noremap <C-A-f> :Autoformat<CR>
-
-nnoremap <C-p> :FuzzyOpen<CR>
-
-syntax enable
-
-autocmd BufNewFile,BufReadPost *.scxml set syntax=xml
-" autocmd BufNewFile,BufReadPost *.scxml set filetype=xml
-" markdown settings
-"autocmd BufNewFile,BufReadPost *.md set filetype=markdown
-"autocmd BufNewFile,BufReadPost *.markdown set filetype=markdown
-"autocmd BufNewFile,BufReadPost *.mrk set filetype=markdown
-"autocmd BufNewFile,BufReadPost *.txt set filetype=markdown
 
 " Auto lists: Automatically continue/end lists by adding markers if the
 " previous line is a list item, or removing them when they are empty
@@ -598,78 +752,20 @@ function! s:auto_list()
     endif
   endif
 endfunction
-
-
 " N.B. Currently only enabled for return key in insert mode, not for normal
 " mode 'o' or 'O'
 if exists(':MarkdownEditBlock')
     inoremap <buffer> <CR> <CR><Esc>:call <SID>auto_list()<CR>A
 endif
 
-" undotree bindings
-nnoremap <F6> :UndotreeToggle<cr>:UndotreeFocus<cr>
-if has("persistent_undo")
-    set undodir=~/.cache/nvim/undo/
-    set undofile
-endif
 
  " softwrap lines
 set breakindent
 let &showbreak = ' ↳ '
 "showbreak="↳·"
 
-"nerdtree calling
-nnoremap <F8> :NERDTreeToggle<cr>
 
-"graphviz plugin settings
-let g:WMGraphviz_viewer = "zathura"
-
-" override the interactive mode to use xdot
-fu! GraphvizInteractive()
-	if !executable(g:WMGraphviz_dot)
-		echoerr 'The "'.g:WMGraphviz_dot.'" executable was not found.'
-		return
-	endif
-
-	silent exec '!xdot '.shellescape(expand('%:p')).' &'
-endfu
-
-" Use deoplete.
-let g:deoplete#enable_at_startup = 1
-
-" deoplete completion for LaTeX
-if !exists('g:deoplete#omni#input_patterns')
-    let g:deoplete#omni#input_patterns = {}
-endif
-let g:deoplete#omni#input_patterns.tex = g:vimtex#re#deoplete
-
-" deoplete setting or ultisnips
-call deoplete#custom#source('ultisnips', 'matchers', ['matcher_fuzzy'])
-
-" UltiSnips settings
-" let g:UltiSnipsEditSplit = "context"
-let g:UltiSnipsSnippetsDir = "~/.config/nvim/UltiSnips"
-" let g:UltiSnipsSnippetDirectories = ["/home/nkoester/.local/share/nvim/plugged/vim-snippets/snippets/"]
-
-"let g:UltiSnipsExpandTrigger="<tab>"
-" termite already used default c-tab
-let g:UltiSnipsListSnippets = "<A-tab>"
-" use jkl; down/up motion
-let g:UltiSnipsJumpForwardTrigger="<c-k>"
-let g:UltiSnipsJumpBackwardTrigger="<c-l>"
-
-
-" supertab
-" tab = go list down
-"let g:SuperTabDefaultCompletionType = "<c-n>"
-"or if your default completion type is currently context then you can use this instead:
-" let g:SuperTabContextDefaultCompletionType = "<c-n>"
-
-
-
-"""""""""""""""""
-" colors etc.
-"""""""""""""""""
+" colors
 set termguicolors
 set background=dark
 colorscheme jellybeans
@@ -701,6 +797,18 @@ hi Visual term=reverse cterm=reverse guibg=Grey
 "reset cursor on exit
 autocmd VimLeave * let &t_me="\<Esc>[6 q"
 
+
+" well .. syntax
+syntax enable
+
+au BufNewFile,BufReadPost *.scxml set syntax=xml
+" autocmd BufNewFile,BufReadPost *.scxml set filetype=xml
+" markdown settings
+"autocmd BufNewFile,BufReadPost *.md set filetype=markdown
+"autocmd BufNewFile,BufReadPost *.markdown set filetype=markdown
+"autocmd BufNewFile,BufReadPost *.mrk set filetype=markdown
+"autocmd BufNewFile,BufReadPost *.txt set filetype=markdown
+
 " better json
 au BufRead,BufNewFile,BufReadPost *.json set syntax=json
 au BufNewFile,BufRead,BufReadPost *.project set filetype=yaml
@@ -724,28 +832,8 @@ hi NonText ctermfg=65
 hi IndentGuidesOdd  ctermbg=235
 hi IndentGuidesEven ctermbg=234
 
-" current word highlight
-let g:vim_current_word#enabled = 1
-" Twins of word under cursor:
-let g:vim_current_word#highlight_twins = 1
-" The word under cursor:
-let g:vim_current_word#highlight_current_word = 1
 
-" highlight CurrentWord ctermbg=90
-" highlight CurrentWordTwins ctermbg=54
-
-let g:vim_current_word#twins_match_id = 502999
-let g:vim_current_word#current_word_match_id = 502998
-
-highlight CurrentWord ctermfg=15 ctermbg=15 cterm=bold
-highlight CurrentWordTwins ctermfg=15 ctermbg=55 cterm=bold
-
-
-
-""""
-"" NEOVIM stuff
-""""
-
+" NEOVIM stuff
 " copy paste to system clipboard
 set mouse=c
 
@@ -784,9 +872,22 @@ nnoremap <silent> <A-;> "_yiw:s/\(\%#\w\+\)\(\_W\+\)\(\w\+\)/\3\2\1/<CR><c-o>/\w
 nnoremap <silent> swl "_yiw?\w\+\_W\+\%#<CR>:s/\(\%#\w\+\)\(\_W\+\)\(\w\+\)/\3\2\1/<CR><c-o><c-l>:nohlsearch<CR>
 nnoremap <silent> swr "_yiw:s/\(\%#\w\+\)\(\_W\+\)\(\w\+\)/\3\2\1/<CR><c-o>/\w\+\_W\+<CR><c-l>:nohlsearch<CR>
 
+nnoremap <silent> <C-k> d$
 
 set diffopt=internal,filler,iwhite
 
 " use shift+0 to paste zero register (yank register)
 nnoremap ) "0P
+
+
+" quickfix window size
+augroup quickfix_autocmds
+  autocmd!
+  autocmd BufReadPost quickfix call AdjustWindowHeight(2, 5)
+augroup END
+
+function! AdjustWindowHeight(minheight, maxheight)
+  execute max([a:minheight, min([line('$') + 1, a:maxheight])])
+        \ . 'wincmd _'
+endfunction
 

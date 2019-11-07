@@ -49,3 +49,6 @@ SQL
 EISEQD
 TLX
 timestamp
+label
+composable
+multidigraph
