@@ -11,7 +11,6 @@ endif
 " Must be first, because it changes other options as a side effect.
 set nocompatible
 
-
 """""""""""""""""""""""""""""
 " Miscellaneous settings ...
 """""""""""""""""""""""""""""
@@ -36,6 +35,22 @@ set scrolloff=5           " distance to scrolling
 set laststatus=2
 
 highlight MatchParen cterm=bold ctermbg=none ctermfg=9  " bracket matching settings
+
+" better json
+au BufRead,BufNewFile,BufReadPost *.json set syntax=json
+au BufNewFile,BufRead,BufReadPost *.project set filetype=yaml
+au BufNewFile,BufRead,BufReadPost *.distribution set filetype=yaml
+au BufNewFile,BufRead,BufReadPost *.template set filetype=yaml
+
+let g:vim_json_syntax_conceal = 0
+
+au BufRead,BufNewFile,BufReadPost *.g4 set syntax=antlr
+au BufRead,BufNewFile,BufReadPost *.md set syntax=markdown
+au BufRead,BufNewFile,BufReadPost *.wiki set syntax=markdown
+" au BufRead,BufNewFile,BufReadPost *.vimwiki set filetype=markdown
+" au BufRead,BufNewFile,BufReadPost *.wiki set filetype=markdown
+au BufRead,BufNewFile,BufReadPost *.cypher set syntax=cypher
+au BufRead,BufNewFile,BufReadPost *.cql set syntax=cypher
 
 if has('mouse')   " Enable mouse
   set mouse=a
@@ -128,10 +143,11 @@ nnoremap <A-_> <C-W>+
 nnoremap <A-=> <C-W>>
 nnoremap <A--> <C-W><
 
-" Control-Enter = append new line
-nnoremap <C-J> A<CR><Esc>
-" Map Ctrl-Space to insert a single space :)
-nnoremap <NUL> i<Space><Esc>
+" Enter = append new line
+nnoremap <CR> o<Esc>
+
+" Map Ctrl-Space to insert a single space
+" nnoremap <NUL> i<Space><Esc>
 
 " replace a word with currently yanked text
 nnoremap S "_diwP
@@ -311,6 +327,64 @@ map <a-Left> :bprevious<CR>
 map <a-Right> :bnext<CR>
 
 
+let g:polyglot_disabled = ['latex']
+
+
+
+" wiki stuff
+autocmd BufNewFile,BufRead *.wiki setf wiki
+filetype plugin on
+
+let g:vimwiki_list = [{'path': '~/private/vimwiki/',
+                     \ 'syntax': 'markdown',
+                     \ 'maxhi': 1,
+                     \ 'auto_toc': 1,
+                     \ 'links_space_char': '_',
+                     \ 'ext': '.wiki' }]
+
+let g:vimwiki_ext2syntax =  {'.md': 'markdown',
+                           \ '.mkdn': 'markdown',
+                           \ '.mdwn': 'markdown',
+                           \ '.mdown': 'markdown',
+                           \ '.markdown': 'markdown',
+                           \ '.mw': 'media',
+                           \ '.wiki': 'markdown'}
+
+let g:vimwiki_hl_cb_checked = 1
+
+let g:vimwiki_listsym_rejected = '✗'
+let g:vimwiki_markdown_link_ext = 1
+
+" disable table mapping in insert mode to allow ultisnip to work
+let g:vimwiki_table_mappings = 0
+
+
+" colorizing plugin
+" green red blue
+" green red
+" red
+" All possible highlighters
+set signcolumn=auto:2
+
+let g:Hexokinase_highlighters = [
+\   'sign_column',
+\   'backgroundfull',
+\ ]
+
+
+" All possible values
+let g:Hexokinase_optInPatterns = [
+\     'full_hex',
+\     'triple_hex',
+\     'rgb',
+\     'rgba',
+\     'hsl',
+\     'hsla',
+\     'colour_names'
+\ ]
+
+
+
 " pathogen setup
 " execute pathogen#infect()
 call plug#begin('~/.local/share/nvim/plugged')
@@ -327,8 +401,10 @@ Plug 'https://github.com/vim-scripts/SearchComplete.git'
 Plug 'https://github.com/easymotion/vim-easymotion.git'
 Plug 'https://github.com/machakann/vim-sandwich'
 
+" Git related
 " Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-fugitive'
+Plug 'mhinz/vim-signify'
 
 Plug 'https://github.com/tpope/vim-unimpaired.git'
 
@@ -375,6 +451,7 @@ Plug 'https://github.com/jelera/vim-javascript-syntax', { 'for': [ 'js', 'html' 
 " Plug 'https://github.com/vim-pandoc/vim-pandoc', { 'for': [ 'markdown', 'mrk', 'md', 'txt' ] }
 " Plug 'https://github.com/vim-pandoc/vim-pandoc-syntax', { 'for': [ 'markdown', 'mrk', 'md', 'txt' ] }
 " Plug 'gabrielelana/vim-markdown', { 'for': [ 'markdown', 'mrk', 'md', 'txt' ] }
+
 " language collection
 Plug 'sheerun/vim-polyglot'
 
@@ -428,10 +505,34 @@ Plug 'https://github.com/wannesm/wmgraphviz.vim'
 " highlights overused words // ToggleDitto
 Plug 'https://github.com/dbmrq/vim-ditto'
 
+" wiki documentation
+Plug 'vimwiki/vimwiki', { 'for': [ 'wiki' ] }
+
+" highlight what was yanked
+Plug 'machakann/vim-highlightedyank'
+
+" online thesaurus a word
+" Plug 'beloglazov/vim-online-thesaurus'
+ " seems to be broken ...
+ " https://github.com/beloglazov/vim-online-thesaurus/issues
+
+" reopen file at last edit position
+Plug  'farmergreg/vim-lastplace'
+
+
+" Switch between single-line and multiline forms of code
+" use gS and gJ
+Plug 'AndrewRadev/splitjoin.vim'
+
+" Let colors be colors
+Plug 'rrethy/vim-hexokinase', { 'do': 'make hexokinase' }
+
 call plug#end()
 
 
-" langauge server stuff
+
+
+" language server stuff
 " todo: diabled due to first entry fill bug?
 let g:LanguageClient_autoStart = 1
 
@@ -448,7 +549,7 @@ let g:vimtex_view_use_temp_files = 1
 let g:vimtex_compiler_progname = 'nvr'
 let g:vimtex_view_method = 'zathura'
 let g:tex_flavor = 'latex'
-let g:polyglot_disabled = ['latex']
+
 " does not work?
 " let g:vimtex_index_split_width = 50
 
@@ -620,6 +721,9 @@ let &showbreak = ' ↳ '
 
 "nerdtree calling
 nnoremap <F8> :NERDTreeToggle<cr>
+let NERDTreeShowHidden=1
+let NERDTreeQuitOnOpen=1
+map  <Leader>n  :NERDTreeFind<CR>
 
 "graphviz plugin settings
 let g:WMGraphviz_viewer = "zathura"
@@ -636,12 +740,18 @@ endfu
 
 " Use deoplete.
 let g:deoplete#enable_at_startup = 1
+call deoplete#custom#option('smart_case', v:true)
 
 " deoplete completion for LaTeX
-if !exists('g:deoplete#omni#input_patterns')
-    let g:deoplete#omni#input_patterns = {}
-endif
-let g:deoplete#omni#input_patterns.tex = g:vimtex#re#deoplete
+" This is new style
+  call deoplete#custom#var('omni', 'input_patterns', {
+          \ 'tex': g:vimtex#re#deoplete
+          \})
+" old style and depricated
+" if !exists('g:deoplete#omni#input_patterns')
+"     let g:deoplete#omni#input_patterns = {}
+" endif
+" let g:deoplete#omni#input_patterns.tex = g:vimtex#re#deoplete
 
 " deoplete setting or ultisnips
 call deoplete#custom#source('ultisnips', 'matchers', ['matcher_fuzzy'])
@@ -649,7 +759,7 @@ call deoplete#custom#source('ultisnips', 'matchers', ['matcher_fuzzy'])
 " UltiSnips settings
 " let g:UltiSnipsEditSplit = "context"
 let g:UltiSnipsSnippetsDir = "~/.config/nvim/UltiSnips"
-" let g:UltiSnipsSnippetDirectories = ["/home/nkoester/.local/share/nvim/plugged/vim-snippets/snippets/"]
+"let g:UltiSnipsSnippetDirectories = ["/home/nkoester/.local/share/nvim/plugged/vim-snippets/snippets/", "/home/nkoester/.config/nvim/UltiSnips/"]
 
 "let g:UltiSnipsExpandTrigger="<tab>"
 " termite already used default c-tab
@@ -701,19 +811,6 @@ hi Visual term=reverse cterm=reverse guibg=Grey
 "reset cursor on exit
 autocmd VimLeave * let &t_me="\<Esc>[6 q"
 
-" better json
-au BufRead,BufNewFile,BufReadPost *.json set syntax=json
-au BufNewFile,BufRead,BufReadPost *.project set filetype=yaml
-au BufNewFile,BufRead,BufReadPost *.distribution set filetype=yaml
-au BufNewFile,BufRead,BufReadPost *.template set filetype=yaml
-au BufNewFile,BufRead,BufReadPost *.project set filetype=yaml
-au BufNewFile,BufRead,BufReadPost *.distribution set filetype=yaml
-let g:vim_json_syntax_conceal = 0
-au BufRead,BufNewFile,BufReadPost *.g4 set syntax=antlr
-au BufRead,BufNewFile,BufReadPost *.md set syntax=markdown
-au BufRead,BufNewFile,BufReadPost *.cypher set syntax=cypher
-au BufRead,BufNewFile,BufReadPost *.cql set syntax=cypher
-
 " special hidden chars
 set listchars=tab:▸\ ,eol:¬
 set list
@@ -740,6 +837,12 @@ let g:vim_current_word#current_word_match_id = 502998
 highlight CurrentWord ctermfg=15 ctermbg=15 cterm=bold
 highlight CurrentWordTwins ctermfg=15 ctermbg=55 cterm=bold
 
+""""
+"" LATE GAME PLUGIN SETTINGS
+""""
+" plugin highlight yanked text
+let g:highlightedyank_highlight_duration=250
+highlight HighlightedyankRegion cterm=reverse gui=reverse
 
 
 """"

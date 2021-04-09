@@ -9,11 +9,50 @@ $0
 endsnippet
 
 
-snippet table "Creates a markdown table."
+snippet mdtable "Creates a markdown table."
 |   |   |   |   |   |
 |---|---|---|---|---|
 |   |   |   |   |   |
 |   |   |   |   |   |
 |   |   |   |   |   |
+endsnippet
+
+
+snippet wikipage
+---
+title: ${1:SECTION_NAME}
+subtitle: ${2}
+date: ${3:`date +%Y-%m-%d`}
+tags: $4
+---
+[<-- Back to index](index.wiki)
+
+
+## $1
+
+${3}
+endsnippet
+
+snippet footnote "Adds a Footnote in markdown style"
+[^${1:1}]
+
+[^$1]: ${2:This is the first footnote.
+    Indent paragraphs ...}
+endsnippet
+
+snippet definition "Adds a Definition in markdown style"
+${1:TERM}
+: ${2:This is the definition of the first term.}
+
+endsnippet
+
+snippet code "Add a Code Block in markdown style"
+`!v repeat(nr2char(96),3)` ${1:json}
+\{
+  ${2:"firstName": "John",
+  "lastName": "Smith",
+  "age": 25}
+\}
+`!v repeat(nr2char(96),3)`
 endsnippet
 
